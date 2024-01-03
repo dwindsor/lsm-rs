@@ -1,0 +1,5 @@
+[alias]
+xtask = "run --package xtask --"
+
+[dependencies]
+aya = "0.10.5"
