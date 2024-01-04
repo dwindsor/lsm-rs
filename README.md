@@ -28,46 +28,50 @@ RUST_LOG=info cargo xtask run
 ## Example Output
 ```json
 {
-  "LsmEvent": {
-    "Data": {
-      "Device": "0",
-      "Group": "dave",
-      "Inode": "5463",
-      "Path": "/usr/bin/fedora-third-party",
-      "User": "dave"
-    },
-    "Meta": {
-      "Type": "Exec"
+  {
+    "LsmEvent": {
+      "Meta": {
+        "SecurityHook": "security_bprm_check",
+        "Type": "Exec"
+      },
+      "Data": {
+        "Device": "0",
+        "Group": "polkitd",
+        "Inode": "5395",
+        "Path": "/usr/bin/pkla-check-authorization",
+        "User": "polkitd"
+      }
+    }
+  },
+  {
+    "LsmEvent": {
+      "Meta": {
+        "SecurityHook": "security_bprm_check",
+        "Type": "Exec"
+      },
+      "Data": {
+        "Device": "0",
+        "Group": "root",
+        "Inode": "29927",
+        "Path": "/usr/lib/systemd/systemd-hostnamed",
+        "User": "root"
+      },
+  },
+  {
+    "LsmEvent": {
+      "Meta": {
+        "SecurityHook": "security_bprm_check",
+        "Type": "Exec"
+      },
+      "Data": {
+        "Device": "0",
+        "Group": "dave",
+        "Inode": "47415",
+        "Path": "/usr/libexec/grepconf.sh",
+        "User": "dave"
+      },
     }
   }
-},
-{
-  "LsmEvent": {
-    "Data": {
-      "Device": "0",
-      "Group": "root",
-      "Inode": "47524",
-      "Path": "/usr/libexec/packagekitd",
-      "User": "root"
-    },
-    "Meta": {
-      "Type": "Exec"
-    }
-  }
-},
-{
-  "LsmEvent": {
-    "Data": {
-      "Device": "0",
-      "Group": "dave",
-      "Inode": "5585",
-      "Path": "/usr/bin/sed",
-      "User": "dave"
-    },
-    "Meta": {
-      "Type": "Exec"
-    }
-  }
-},
+}
 ```
 

@@ -21,6 +21,7 @@ fn serialize_exec_json(etype: EventType, path: &str, uid: u32, gid: u32, dev: u3
         "LsmEvent": {
             "Meta": {
                 "Type": "Exec",
+                "SecurityHook": "security_bprm_check"
             },
             "Data": {
                 "Path": trimmed_path,
