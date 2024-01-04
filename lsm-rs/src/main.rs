@@ -8,16 +8,21 @@ use tokio::signal;
 use lsm_rs_common::{EventType, Event};
 use serde_json::{json, to_string_pretty};
 use char;
+use users::{get_user_by_uid, get_group_by_gid};
 
-fn serialize_exec_json(etype: EventType, path: &str, dev: u32, inode: u64) -> String {
+fn serialize_exec_json(etype: EventType, path: &str, uid: u32, gid: u32, dev: u32, inode: u64) -> String {
     let tpath = path.to_string();
     let trimmed_path = tpath.trim_matches(char::from(0));
 
+    let user = users::get_user_by_uid(uid).unwrap();
+    let group = users::get_group_by_gid(gid).unwrap();
     let event = json!({
         "type": "Exec",
         "path": trimmed_path,
-        "device": dev,
-        "inode": inode
+        "user": user.name().to_string_lossy(),
+        "group": group.name().to_string_lossy(),
+        "device": dev.to_string(),
+        "inode": inode.to_string()
     });
 
     to_string_pretty(&event).unwrap()
@@ -101,7 +106,7 @@ async fn main() -> Result<(), anyhow::Error> {
                     let path = unsafe {
                         core::str::from_utf8_unchecked(&data.path)
                     };
-                    println!("{}", serialize_exec_json(etype, path, data.dev, data.inode));
+                    println!("{},", serialize_exec_json(etype, path, data.uid, data.gid, data.dev, data.inode));
 
                     //println!("Event received: {:?}, {}, {}, {}", etype, path, data.dev, data.inode);
                 }

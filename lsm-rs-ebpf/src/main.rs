@@ -28,12 +28,14 @@ pub fn bprm_check_security(ctx: LsmContext) -> i32 {
     }
 }
 
-unsafe fn submit_event(ctx: &LsmContext, filename: &[u8; 128], dev: u32, ino: u64) -> Result<i32, i32> {
+unsafe fn submit_event(ctx: &LsmContext, filename: &[u8; 128], uid: u32, gid: u32, dev: u32, ino: u64) -> Result<i32, i32> {
     let buf_ptr = SCRATCH.get_ptr_mut(0).ok_or(-1)?;
     let event: &mut Event = &mut *buf_ptr;
 
     event.etype = EventType::Exec;
     event.path = *filename;
+    event.uid = uid;
+    event.gid = gid;
     event.dev = dev;
     event.inode = ino;
 
@@ -47,6 +49,8 @@ unsafe fn try_bprm_check_security(ctx: LsmContext) -> Result<i32, i32> {
 
     let dev: u32 = (*(*(*bprm).file).f_inode).i_rdev;
     let ino: u64 = (*(*(*bprm).file).f_inode).i_ino;
+    let uid: u32 = (*(*bprm).cred).uid.val;
+    let gid: u32 = (*(*bprm).cred).uid.val;
     let mut filename: [u8; 128] = [0u8; 128];
     let path = unsafe {
         core::str::from_utf8_unchecked(
@@ -56,7 +60,7 @@ unsafe fn try_bprm_check_security(ctx: LsmContext) -> Result<i32, i32> {
     };
     filename[127] = 0;
 
-    submit_event(&ctx, &filename, dev, ino);
+    submit_event(&ctx, &filename, uid, gid, dev, ino);
 
     Ok(0)
 }
