@@ -2,15 +2,15 @@ use aya::{programs::Lsm, Btf};
 use aya::{include_bytes_aligned, Bpf, maps::perf::AsyncPerfEventArray, util::online_cpus};
 use aya_log::BpfLogger;
 use bytes::BytesMut;
-use libc::EFAULT;
+
 use log::{info, warn, debug};
 use tokio::signal;
 use lsm_rs_common::{EventType, Event};
 use serde_json::{json, to_string_pretty};
-use char;
-use users::{get_user_by_uid, get_group_by_gid};
 
-fn serialize_exec_json(etype: EventType, path: &str, uid: u32, gid: u32, dev: u32, inode: u64) -> String {
+
+
+fn serialize_exec_json(_etype: EventType, path: &str, uid: u32, gid: u32, dev: u32, inode: u64) -> String {
     let tpath = path.to_string();
     let trimmed_path = tpath.trim_matches(char::from(0));
 
@@ -42,7 +42,7 @@ fn load_programs(bpf: &mut Bpf) -> Result<(), anyhow::Error> {
     program.load("bprm_check_security", &btf)?;
     program.attach()?;
 
-    let mut exec_events = AsyncPerfEventArray::try_from(bpf.map_mut("EVENTS").unwrap()).unwrap();
+    let exec_events = AsyncPerfEventArray::try_from(bpf.map_mut("EVENTS").unwrap()).unwrap();
     print_type_of(&exec_events);
     Ok(())
 }

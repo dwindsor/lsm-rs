@@ -1,6 +1,6 @@
 #![no_std]
 
-use core::primitive::str;
+
 
 #[derive(Clone, Copy, Debug)]
 #[repr(C)]
