@@ -28,28 +28,46 @@ RUST_LOG=info cargo xtask run
 ## Example Output
 ```json
 {
-  "device": "0",
-  "group": "dave",
-  "inode": "5046",
-  "path": "/usr/bin/id",
-  "type": "Exec",
-  "user": "dave"
+  "LsmEvent": {
+    "Data": {
+      "Device": "0",
+      "Group": "dave",
+      "Inode": "5463",
+      "Path": "/usr/bin/fedora-third-party",
+      "User": "dave"
+    },
+    "Meta": {
+      "Type": "Exec"
+    }
+  }
 },
 {
-  "device": "0",
-  "group": "dave",
-  "inode": "5032",
-  "path": "/usr/bin/hostnamectl",
-  "type": "Exec",
-  "user": "dave"
+  "LsmEvent": {
+    "Data": {
+      "Device": "0",
+      "Group": "root",
+      "Inode": "47524",
+      "Path": "/usr/libexec/packagekitd",
+      "User": "root"
+    },
+    "Meta": {
+      "Type": "Exec"
+    }
+  }
 },
 {
-  "device": "0",
-  "group": "polkitd",
-  "inode": "5395",
-  "path": "/usr/bin/pkla-check-authorization",
-  "type": "Exec",
-  "user": "polkitd"
+  "LsmEvent": {
+    "Data": {
+      "Device": "0",
+      "Group": "dave",
+      "Inode": "5585",
+      "Path": "/usr/bin/sed",
+      "User": "dave"
+    },
+    "Meta": {
+      "Type": "Exec"
+    }
+  }
 },
 ```
 

@@ -16,13 +16,20 @@ fn serialize_exec_json(etype: EventType, path: &str, uid: u32, gid: u32, dev: u3
 
     let user = users::get_user_by_uid(uid).unwrap();
     let group = users::get_group_by_gid(gid).unwrap();
-    let event = json!({
-        "type": "Exec",
-        "path": trimmed_path,
-        "user": user.name().to_string_lossy(),
-        "group": group.name().to_string_lossy(),
-        "device": dev.to_string(),
-        "inode": inode.to_string()
+    let event = json!(
+    {
+        "LsmEvent": {
+            "Meta": {
+                "Type": "Exec",
+            },
+            "Data": {
+                "Path": trimmed_path,
+                "User": user.name().to_string_lossy(),
+                "Group": group.name().to_string_lossy(),
+                "Device": dev.to_string(),
+                "Inode": inode.to_string()
+            }
+        }
     });
 
     to_string_pretty(&event).unwrap()
