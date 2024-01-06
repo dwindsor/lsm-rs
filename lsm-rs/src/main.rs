@@ -4,11 +4,10 @@ use aya_log::BpfLogger;
 use bytes::BytesMut;
 
 use log::{info, warn, debug};
+use tokio::net::{UnixListener, UnixStream};
 use tokio::signal;
 use lsm_rs_common::{EventType, Event};
 use serde_json::{json, to_string_pretty};
-
-
 
 fn serialize_exec_json(_etype: EventType, path: &str, uid: u32, gid: u32, dev: u32, inode: u64) -> String {
     let tpath = path.to_string();
@@ -16,24 +15,9 @@ fn serialize_exec_json(_etype: EventType, path: &str, uid: u32, gid: u32, dev: u
 
     let user = users::get_user_by_uid(uid).unwrap();
     let group = users::get_group_by_gid(gid).unwrap();
-    let event = json!(
-    {
-        "LsmEvent": {
-            "Meta": {
-                "Type": "Exec",
-                "SecurityHook": "security_bprm_check"
-            },
-            "Data": {
-                "Path": trimmed_path,
-                "User": user.name().to_string_lossy(),
-                "Group": group.name().to_string_lossy(),
-                "Device": dev.to_string(),
-                "Inode": inode.to_string()
-            }
-        }
-    });
 
-    to_string_pretty(&event).unwrap()
+    let eventjson = json!({ "etype": "exec", "securityhook": "security_bprm_check", "path": trimmed_path, "device": dev.to_string(), "inode": inode.to_string(), "username": user.name().to_string_lossy(), "group": group.name().to_string_lossy() });
+    eventjson.to_string()
 }
 
 fn load_programs(bpf: &mut Bpf) -> Result<(), anyhow::Error> {
@@ -48,11 +32,12 @@ fn load_programs(bpf: &mut Bpf) -> Result<(), anyhow::Error> {
 }
 
 fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
+    println!("{}", std::any::type_name::<T>());
 }
 
-fn load_perf_array(bpf: &mut Bpf) -> Result<(), anyhow::Error> {
-    let _array = AsyncPerfEventArray::try_from(bpf.map_mut("EXEC_EVENTS").unwrap()).unwrap(); 
+async fn dispatch_event(mut stream: UnixStream, json: String) -> Result<(), anyhow::Error> {
+
+
     Ok(())
 }
 
@@ -95,6 +80,8 @@ async fn main() -> Result<(), anyhow::Error> {
     let cpus = online_cpus()?;
     let num_cpus = cpus.len();
 
+    //let sock = UnixListener::bind("/tmp/falco-lsm").unwrap();
+
     for cpu in cpus {
         let mut buf = exec_events.open(cpu, None)?;
 
@@ -102,19 +89,20 @@ async fn main() -> Result<(), anyhow::Error> {
             let mut buffers = (0..num_cpus)
                 .map(|_| BytesMut::with_capacity(10204))
                 .collect::<Vec<_>>();
-
+        
             loop {
                 let events = buf.read_events(&mut buffers).await.unwrap();
                 for i in 0..events.read {
                     let buf = &mut buffers[i];
-                    let ptr = buf.as_ptr() as *const Event;
+                    let ptr = buf.as_ptr().cast::<Event>();
                     let data = unsafe { ptr.read_unaligned() };     
 
                     let etype: EventType = data.etype;
                     let path = unsafe {
                         core::str::from_utf8_unchecked(&data.path)
                     };
-                    println!("{},", serialize_exec_json(etype, path, data.uid, data.gid, data.dev, data.inode));
+
+                    println!("{}", serialize_exec_json(etype, path, data.uid, data.gid, data.dev, data.inode));
 
                     //println!("Event received: {:?}, {}, {}, {}", etype, path, data.dev, data.inode);
                 }
