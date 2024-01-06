@@ -35,12 +35,6 @@ fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>());
 }
 
-async fn dispatch_event(mut stream: UnixStream, json: String) -> Result<(), anyhow::Error> {
-
-
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
     env_logger::init();
